@@ -23,20 +23,39 @@ joints_v={-1,-1,-1,-1}
 
 
 # Simulation 
+# K=1
+# Af= 0.5
+# sigma_f = 10
+# sigma_s = 150
+# tau_m = 10*ms
+# tau_s = K*tau_m
+# i_inj = 1
+
+
+
+# K=1
+# Af= 0.5
+# sigma_f = 10
+# sigma_s = 150
+# tau_m = 10*ms
+# tau_s = K*tau_m
+# i_inj = 1
+
+
 K=1
-Af= 0.5
-sigma_f = 10
+Af= 1
+sigma_f = 0.1
 sigma_s = 150
-tau_m = 10*ms
+tau_m = 1*ms
 tau_s = K*tau_m
 i_inj = 1
 
 
-stimilus = TimedArray([0,0,40],dt = 10*ms)
+stimilus = TimedArray([0,0,40,40,40,40,0],dt = 10*ms)
 
 injected=[]
 for i in range(0,100):
-    injected.append(sin(10*Hz*stimilus(i*ms)*i*ms+3000))
+    injected.append(0.8*sin(30*Hz*stimilus(i*ms)*i*ms))
 
 plt.plot(injected)
 plt.ylabel('i_inj')
@@ -46,14 +65,14 @@ plt.show()
 eqs = Equations('''
 dv/dt = (-v + Af*tanh(sigma_f/Af*v)-q + i_inj) /tau_m : 1
 dq/dt = (-q + sigma_s * v)/tau_s : 1
-i_inj = 0.8*sin(30*Hz*stimilus(t)*t+3000) : 1
+i_inj = 0.8*sin(30*Hz*stimilus(t)*t) : 1
 ''')
 
 G = NeuronGroup(10, eqs,method="rk4")
 trace = StateMonitor(G, ('v','q','i_inj'), record=True)
 
-G.v = 0.5*rand()
-G.q = 0.5*rand()
+#G.v = 0.5*rand()
+#G.q = 0.5*rand()
 
 run(200*ms, report='text')
 
@@ -111,6 +130,7 @@ if client_id!=-1:
     j=0
     a = (trace.i_inj[0]).tolist()
     b = (trace.v[0]).tolist()
+    #b = (trace.q[0]).tolist()
     continue_running = True
     while(continue_running):
     #Ask for stop running
